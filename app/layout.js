@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${serifFont.variable} ${monoFont.variable} ${sansFont.variable} antialiased dark`}
     >
       <body className="bg-[#050505] text-[#ededed] selection:bg-[#34d399]/30 selection:text-[#34d399]">

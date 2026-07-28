@@ -1,0 +1,115 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Entrance & Exit", "category": "gate" },
+      "geometry": { "type": "Point", "coordinates": [77.06096086908933, 10.828978439858975] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Pillaiyar Temple", "category": "landmark" },
+      "geometry": { "type": "Point", "coordinates": [77.06075661992477, 10.828853624054542] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Open Air Theatre", "category": "facility" },
+      "geometry": { "type": "Point", "coordinates": [77.060867534126, 10.828265352199942] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Parking Area", "category": "parking" },
+      "geometry": { "type": "Point", "coordinates": [77.06148724588863, 10.828136629491372] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "College Entrance", "category": "building" },
+      "geometry": { "type": "Point", "coordinates": [77.06054236845684, 10.828040262684885] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Girls Hostel", "category": "hostel" },
+      "geometry": { "type": "Point", "coordinates": [77.0598278448867, 10.828036072819456] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Student Medical Center, SECET", "category": "medical" },
+      "geometry": { "type": "Point", "coordinates": [77.06126496670466, 10.827811923480816] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Food Court", "category": "dining" },
+      "geometry": { "type": "Point", "coordinates": [77.06127730251427, 10.827239433192553] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Sri Eshwar Drone Tech Pvt Ltd", "category": "lab" },
+      "geometry": { "type": "Point", "coordinates": [77.0610521739888, 10.826951673097359] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Sri Eshwar College of Engineering (Boys Hostel)", "category": "hostel" },
+      "geometry": { "type": "Point", "coordinates": [77.06065434412932, 10.826766900688543] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Main Archway Trail", "category": "trail" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.06096086908933, 10.828978439858975],
+          [77.06075661992477, 10.828853624054542],
+          [77.06054236845684, 10.828040262684885]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Theatre Way", "category": "trail" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.06054236845684, 10.828040262684885],
+          [77.060867534126, 10.828265352199942],
+          [77.06148724588863, 10.828136629491372]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "West Canopy Path", "category": "trail" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.06054236845684, 10.828040262684885],
+          [77.0598278448867, 10.828036072819456]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Boys Hostel Link", "category": "trail" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.06054236845684, 10.828040262684885],
+          [77.06065434412932, 10.826766900688543]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Drone Tech and Dining Loop", "category": "trail" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.06065434412932, 10.826766900688543],
+          [77.0610521739888, 10.826951673097359],
+          [77.06127730251427, 10.827239433192553],
+          [77.06126496670466, 10.827811923480816],
+          [77.060867534126, 10.828265352199942]
+        ]
+      }
+    }
+  ]
+}

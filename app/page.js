@@ -43,6 +43,13 @@ const SHOWCASE_DESTINATIONS = [
     tag: "04 • SUNSET",
     bg: "/assets/bg/bg_5.webp",
     desc: "SUNSET CANOPY DATA"
+  },
+  {
+    id: "sri-eswar-college",
+    name: "Sri Eshwar Campus",
+    tag: "05 • CAMPUS",
+    bg: "/assets/bg/bg_3.webp",
+    desc: "OFFLINE CAMPUS VECTOR"
   }
 ];
 

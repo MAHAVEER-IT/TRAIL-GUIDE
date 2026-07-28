@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Compass, Network, Eye, Smartphone } from "lucide-react";
 import InteractiveMap from "../../components/InteractiveMap";
 import HeroHeader from "../../components/HeroHeader";
+import QRCode from "react-qr-code";
 
 // Sector detail database matrix for pre-rendered pages
 const DESTINATIONS = [
@@ -87,16 +88,30 @@ const DESTINATIONS = [
       "/assets/bg/bg_2.webp",
       "/assets/bg/bg_1.webp"
     ],
-    coords: "18°34'32\"S, 46°25'12\"E",
-    lat: -18.5755,
-    lng: 46.42,
-    alt: "412m",
-    fileSize: "0.95 MB",
-    difficulty: "Moderate Trek",
-    duration: "2 - 4 Days",
-    transceivers: "6 Nodes Active",
-    frequency: "868 MHz ISM",
     synopsis: "The Madagascar Spiny Forest consists of semi-arid thorny woodlands and limestone needle labyrinths (Tsingy). GPS visibility is functional, but ground traversal is extremely difficult. Mesh node coverage is sparse. Adventurers must deploy direction high-gain antennas to connect to localized beacons along mapped paths."
+  },
+  {
+    id: "sri-eswar-college",
+    name: "Sri Eshwar College of Engineering",
+    title: "SRI ESHWAR\nCOLLEGE OF ENGINEERING",
+    subtitle: "SECTOR 05 • COIMBATORE, INDIA",
+    bgImage: "/assets/bg/bg_3.webp",
+    gallery: [
+      "/assets/bg/bg_3.webp",
+      "/assets/bg/bg_1.webp",
+      "/assets/bg/bg_4.webp",
+      "/assets/bg/bg_6.webp"
+    ],
+    coords: "10°49'40.9\"N, 77°03'37.9\"E",
+    lat: 10.82804,
+    lng: 77.06054,
+    alt: "250m",
+    fileSize: "14.2 KB",
+    difficulty: "Campus Navigation",
+    duration: "1 - 2 Hours",
+    transceivers: "10 landmarks mapped",
+    frequency: "Offline Vector Map",
+    synopsis: "Sri Eshwar College of Engineering represents a custom mapped campus network topology containing 10 high-precision landmarks (Entrance, Pillaiyar Temple, Open Air Theatre, Girls/Boys Hostels, Food Court, Drone Tech Lab, and Medical Center). This offline vector map packet allows seamless indoor and outdoor navigation with zero cellular network or Wi-Fi coverage required."
   }
 ];
 
@@ -236,25 +251,13 @@ export default async function DestinationDetail({ params }) {
               style={{ backgroundImage: `url('${dest.bgImage}')` }}
             />
 
-            {/* Geometric Procedural Vector QR Code SVG */}
-            <div className="w-36 h-36 bg-white p-3 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.08)] z-10 relative">
-              <svg className="w-full h-full text-black" viewBox="0 0 29 29" fill="currentColor" shapeRendering="crispEdges">
-                {/* Finder Pattern (Top-Left) */}
-                <path d="M0,0 h7 v7 h-7 z M1,1 h5 v5 h-5 z M2,2 h3 v3 h-3 z" />
-                {/* Finder Pattern (Top-Right) */}
-                <path d="M22,0 h7 v7 h-7 z M23,1 h5 v5 h-5 z M24,2 h3 v3 h-3 z" />
-                {/* Finder Pattern (Bottom-Left) */}
-                <path d="M0,22 h7 v7 h-7 z M1,23 h5 v5 h-5 z M2,24 h3 v3 h-3 z" />
-                {/* Timing Patterns */}
-                <path d="M8,6 h13 v1 h-13 z M6,8 v13 h1 v-13 z" />
-                {/* Alignment Pattern (Bottom-Right) */}
-                <path d="M18,18 h5 v5 h-5 z M19,19 h3 v3 h-3 z" />
-                {/* Mock Data Blocks */}
-                <path d="M 8 9 h 2 v 2 h -2 z M 12 8 h 1 v 3 h -1 z M 15 9 h 3 v 1 h -3 z M 11 11 h 3 v 1 h -3 z M 18 10 h 2 v 2 h -2 z" />
-                <path d="M 9 13 h 4 v 1 h -4 z M 15 13 h 2 v 2 h -2 z M 8 16 h 1 v 3 h -1 z M 11 17 h 3 v 1 h -3 z M 18 15 h 3 v 1 h -3 z" />
-                <path d="M 13 20 h 2 v 2 h -2 z M 16 21 h 4 v 1 h -4 z M 10 24 h 3 v 1 h -3 z M 14 25 h 2 v 2 h -2 z M 25 15 h 2 v 2 h -2 z" />
-                <path d="M 15 28 h 4 v 1 h -4 z M 20 27 h 3 v 1 h -3 z M 24 25 h 3 v 2 h -3 z" />
-              </svg>
+            {/* Dynamic Vector QR Code */}
+            <div className="w-36 h-36 bg-white p-2.5 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.08)] z-10 relative">
+              <QRCode 
+                value={`trailguide://map/download?id=${dest.id === "sri-eswar-college" ? "sec_campus_v1" : dest.id}&url=https://trail-guide-pearl.vercel.app/data/${dest.id === "sri-eswar-college" ? "sec-campus" : dest.id}.geojson`} 
+                size={120} 
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+              />
             </div>
 
             <div className="flex flex-col gap-2 max-w-[260px] z-10 relative">

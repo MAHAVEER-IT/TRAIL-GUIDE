@@ -42,6 +42,15 @@ const DESTINATIONS = [
     bgImage: "/assets/bg/bg_5.webp",
     coords: "18°34'32\"S, 46°25'12\"E",
     alt: "412m"
+  },
+  {
+    id: "sri-eswar-college",
+    title: "SRI ESHWAR\nCOLLEGE OF ENGINEERING",
+    subtitle: "SECTOR 05 • COIMBATORE, INDIA",
+    description: "Offline vector campus mapped landmarks and walking paths. Zero connectivity routing index.",
+    bgImage: "/assets/bg/bg_3.webp",
+    coords: "10°49'40.9\"N, 77°03'37.9\"E",
+    alt: "250m"
   }
 ];
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Compass, Activity, MapPin, ShieldAlert, Search, X } from "lucide-react";
 
-// Hardcoded Array of 1 Primary Wilderness Sector
+// Hardcoded Array of 2 Primary Wilderness Sectors
 const DESTINATIONS = [
   {
     id: "sri-eswar-college",
@@ -15,6 +15,15 @@ const DESTINATIONS = [
     bgImage: "/assets/sece/main_banner.png",
     coords: "10°49'40.9\"N, 77°03'37.9\"E",
     alt: "250m"
+  },
+  {
+    id: "sumatra-jungle",
+    title: "SUMATRA\nDEEP FOREST CANOPY",
+    subtitle: "SECTOR 01 • INDONESIA",
+    description: "Dense equatorial rain canopy mapped with dense lidar. Features heavy fog overlays, ad-hoc mesh routes, and high transceiver node density.",
+    bgImage: "/assets/bg/bg_1.webp",
+    coords: "04°32'15\"N, 101°24'02\"E",
+    alt: "210m"
   }
 ];
 

@@ -29,6 +29,29 @@ const DESTINATIONS = [
     transceivers: "10 landmarks mapped",
     frequency: "Offline Vector Map",
     synopsis: "Sri Eshwar College of Engineering represents a custom mapped campus network topology containing 10 high-precision landmarks (Entrance, Pillaiyar Temple, Open Air Theatre, Girls/Boys Hostels, Food Court, Drone Tech Lab, and Medical Center). This offline vector map packet allows seamless indoor and outdoor navigation with zero cellular network or Wi-Fi coverage required."
+  },
+  {
+    id: "sumatra-jungle",
+    name: "Sumatra Jungle Canopy",
+    title: "SUMATRA\nDEEP FOREST CANOPY",
+    subtitle: "SECTOR 01 • INDONESIA",
+    bgImage: "/assets/bg/bg_1.webp",
+    gallery: [
+      "/assets/bg/bg_1.webp",
+      "/assets/bg/bg_2.webp",
+      "/assets/bg/bg_4.webp",
+      "/assets/bg/bg_5.webp"
+    ],
+    coords: "04°32'15\"N, 101°24'02\"E",
+    lat: 4.5375,
+    lng: 101.4006,
+    alt: "210m",
+    fileSize: "1.84 MB",
+    difficulty: "Extreme Adventure",
+    duration: "4 - 6 Days",
+    transceivers: "14 Nodes Active",
+    frequency: "868 MHz ISM",
+    synopsis: "The Sumatra Jungle Canopy represents one of the most dense, infrastructure-less sectors currently mapped. Spanning over 400 square kilometers of equatorial rainforest, navigation here is heavily restricted by dense cloud cover and multi-layered canopy foliage. The area has been mapped using high-pulse aerial lidar to generate accurate digital elevation contours underneath the jungle canopy. Adventurers must maintain ad-hoc mesh connectivity with localized transceivers deployed along major river contours to verify coordinates in real-time."
   }
 ];
 

@@ -8,99 +8,16 @@ import QRCode from "react-qr-code";
 // Sector detail database matrix for pre-rendered pages
 const DESTINATIONS = [
   {
-    id: "sumatra-jungle",
-    name: "Sumatra Jungle Canopy",
-    title: "SUMATRA\nJUNGLE CANOPY",
-    subtitle: "SECTOR 01 • INDONESIA",
-    bgImage: "/assets/bg/bg_1.webp",
-    gallery: [
-      "/assets/bg/bg_1.webp",
-      "/assets/bg/bg_2.webp",
-      "/assets/bg/bg_3.webp",
-      "/assets/bg/bg_4.webp"
-    ],
-    coords: "04°32'15\"N, 101°24'02\"E",
-    lat: 4.5375,
-    lng: 101.4006,
-    alt: "210m",
-    fileSize: "1.84 MB",
-    difficulty: "Extreme Adventure",
-    duration: "4 - 6 Days",
-    transceivers: "14 Nodes Active",
-    frequency: "868 MHz ISM",
-    synopsis: "The Sumatra Jungle Canopy represents one of the most dense, infrastructure-less sectors currently mapped. Spanning over 400 square kilometers of equatorial rainforest, navigation here is heavily restricted by dense cloud cover and multi-layered canopy foliage. The area has been mapped using high-pulse aerial lidar to generate accurate digital elevation contours underneath the jungle canopy. Adventurers must maintain ad-hoc mesh connectivity with localized transceivers deployed along major river contours to verify coordinates in real-time."
-  },
-  {
-    id: "patagonian-peak",
-    name: "Patagonia High Alpine Ridge",
-    title: "PATAGONIA\nHIGH ALPINE RIDGE",
-    subtitle: "SECTOR 02 • CHILE",
-    bgImage: "/assets/bg/bg_2.webp",
-    gallery: [
-      "/assets/bg/bg_2.webp",
-      "/assets/bg/bg_3.webp",
-      "/assets/bg/bg_5.webp",
-      "/assets/bg/bg_6.webp"
-    ],
-    coords: "46°32'42\"S, 72°24'11\"W",
-    lat: -46.545,
-    lng: -72.403,
-    alt: "1235m",
-    fileSize: "2.12 MB",
-    difficulty: "Severe Alpine",
-    duration: "3 - 5 Days",
-    transceivers: "8 Nodes Active",
-    frequency: "915 MHz ISM",
-    synopsis: "The Patagonian High Alpine Ridge features vertical granite spires, active crevasse fields, and extreme wind chill parameters. Cellular signals are blocked by high vertical terrain walls. TerraSafe off-grid tracking utilizes inertial dead-reckoning filters adjusted for low-temperature sensor biases. It is critical to download localized vector contour indexes before crossing above the snow line."
-  },
-  {
-    id: "okinawa-grotto",
-    name: "Okinawa Subterranean Caves",
-    title: "OKINAWA\nSUBTERRANEAN CAVES",
-    subtitle: "SECTOR 03 • JAPAN",
-    bgImage: "/assets/bg/bg_4.webp",
-    gallery: [
-      "/assets/bg/bg_4.webp",
-      "/assets/bg/bg_1.webp",
-      "/assets/bg/bg_3.webp",
-      "/assets/bg/bg_5.webp"
-    ],
-    coords: "26°33'10\"N, 127°24'35\"E",
-    lat: 26.5527,
-    lng: 127.4097,
-    alt: "-42m",
-    fileSize: "1.25 MB",
-    difficulty: "Challenging Caves",
-    duration: "1 - 2 Days",
-    transceivers: "11 Nodes Active",
-    frequency: "433 MHz ISM",
-    synopsis: "The Okinawa Subterranean Caves present extreme underground navigation hazards. Because GNSS/satellite navigation cannot penetrate rock layers, mapping data relies on dead-reckoning inertial sensors calibrated for cave walking speeds. Localized peer-to-peer ad-hoc transceivers are placed inside major chambers to flood node packets and verify location indexes."
-  },
-  {
-    id: "malagasy-canopy",
-    name: "Madagascar Spiny Forest",
-    title: "MADAGASCAR\nSPINY FOREST",
-    subtitle: "SECTOR 04 • EAST AFRICA",
-    bgImage: "/assets/bg/bg_5.webp",
-    gallery: [
-      "/assets/bg/bg_5.webp",
-      "/assets/bg/bg_6.webp",
-      "/assets/bg/bg_2.webp",
-      "/assets/bg/bg_1.webp"
-    ],
-    synopsis: "The Madagascar Spiny Forest consists of semi-arid thorny woodlands and limestone needle labyrinths (Tsingy). GPS visibility is functional, but ground traversal is extremely difficult. Mesh node coverage is sparse. Adventurers must deploy direction high-gain antennas to connect to localized beacons along mapped paths."
-  },
-  {
     id: "sri-eswar-college",
     name: "Sri Eshwar College of Engineering",
     title: "SRI ESHWAR\nCOLLEGE OF ENGINEERING",
     subtitle: "SECTOR 05 • COIMBATORE, INDIA",
-    bgImage: "/assets/bg/bg_3.webp",
+    bgImage: "/assets/sece/main_banner.png",
     gallery: [
-      "/assets/bg/bg_3.webp",
-      "/assets/bg/bg_1.webp",
-      "/assets/bg/bg_4.webp",
-      "/assets/bg/bg_6.webp"
+      "/assets/sece/main_banner.png",
+      "/assets/sece/ex2.jpg",
+      "/assets/sece/ex3.jpg",
+      "/assets/sece/ex4.jpg"
     ],
     coords: "10°49'40.9\"N, 77°03'37.9\"E",
     lat: 10.82804,
@@ -219,15 +136,15 @@ export default async function DestinationDetail({ params }) {
             </div>
           </div>
 
-          {/* Static Map Canvas Placeholder */}
+          {/* Dynamic Map Canvas */}
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <h3 className="font-mono text-xs tracking-[0.2em] text-zinc-500 uppercase flex items-center gap-2">
                 <Network className="w-3.5 h-3.5 text-emerald-400" />
-                TOPOLOGICAL EXPEDITION MAP
+                REAL-TIME ROUTING & TELEMETRY
               </h3>
               <span className="font-mono text-[9px] text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-500/20 uppercase">
-                Offline Cache Loaded
+                GPS ROUTE ACTIVE
               </span>
             </div>
 

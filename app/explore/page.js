@@ -5,50 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Compass, Activity, MapPin, ShieldAlert, Search, X } from "lucide-react";
 
-// Hardcoded Array of 4 Primary Wilderness Sectors
+// Hardcoded Array of 1 Primary Wilderness Sector
 const DESTINATIONS = [
-  {
-    id: "sumatra-jungle",
-    title: "SUMATRA\nJUNGLE CANOPY",
-    subtitle: "SECTOR 01 • INDONESIA",
-    description: "Deep equatorial rain canopy mapped with dense lidar. Features heavy fog overlays, ad-hoc mesh routes, and high transceiver node density.",
-    bgImage: "/assets/bg/bg_1.webp",
-    coords: "04°32'15\"N, 101°24'02\"E",
-    alt: "210m"
-  },
-  {
-    id: "patagonian-peak",
-    title: "PATAGONIA\nHIGH ALPINE RIDGE",
-    subtitle: "SECTOR 02 • CHILE",
-    description: "Glacial ice fields and vertical granite towers. Severe weather profiles. Dynamic PDR sensory tracks calibrated for sub-zero operation.",
-    bgImage: "/assets/bg/bg_2.webp",
-    coords: "46°32'42\"S, 72°24'11\"W",
-    alt: "1235m"
-  },
-  {
-    id: "okinawa-grotto",
-    title: "OKINAWA\nSUBTERRANEAN CAVES",
-    subtitle: "SECTOR 03 • JAPAN",
-    description: "Subterranean coral grottos. Dead-reckoning inertial navigation locks. Zero satellite penetration, relying on local transceiver relays.",
-    bgImage: "/assets/bg/bg_4.webp",
-    coords: "26°33'10\"N, 127°24'35\"E",
-    alt: "-42m"
-  },
-  {
-    id: "malagasy-canopy",
-    title: "MADAGASCAR\nSPINY FOREST",
-    subtitle: "SECTOR 04 • EAST AFRICA",
-    description: "Semi-arid thorny woodlands and limestone needle labyrinths. Low-light telemetry active, mesh coverage: sparse.",
-    bgImage: "/assets/bg/bg_5.webp",
-    coords: "18°34'32\"S, 46°25'12\"E",
-    alt: "412m"
-  },
   {
     id: "sri-eswar-college",
     title: "SRI ESHWAR\nCOLLEGE OF ENGINEERING",
     subtitle: "SECTOR 05 • COIMBATORE, INDIA",
     description: "Offline vector campus mapped landmarks and walking paths. Zero connectivity routing index.",
-    bgImage: "/assets/bg/bg_3.webp",
+    bgImage: "/assets/sece/main_banner.png",
     coords: "10°49'40.9\"N, 77°03'37.9\"E",
     alt: "250m"
   }

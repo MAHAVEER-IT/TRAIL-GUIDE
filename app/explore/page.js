@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Compass, Activity, MapPin, ShieldAlert, Search, X } from "lucide-react";
+import { ArrowLeft, Compass, Activity, MapPin, ShieldAlert, Search, X, Radio } from "lucide-react";
 
 // Hardcoded Array of 2 Primary Wilderness Sectors
 const DESTINATIONS = [
@@ -221,8 +221,14 @@ export default function ExploreGateway() {
           )}
         </div>
 
-        {/* Spacer to keep flex balance */}
-        <div className="w-[100px] md:w-[150px] invisible" />
+        {/* SOS Incident Feed Link (Aligned Right) */}
+        <Link 
+          href="/sos"
+          className="font-mono text-[9px] md:text-[10px] px-3.5 py-1.5 rounded-full bg-rose-950/20 border border-rose-900/50 text-rose-400 hover:bg-rose-900/30 hover:border-rose-500 hover:text-white transition-all pointer-events-auto flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(244,63,94,0.1)]"
+        >
+          <Radio className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
+          SOS FEED
+        </Link>
       </header>
 
       {/* Empty State Screen (If search returns 0 sectors) */}

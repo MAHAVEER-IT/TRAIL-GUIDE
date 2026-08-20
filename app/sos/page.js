@@ -23,6 +23,7 @@ export default function SosControlRoom() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedAlertId, setSelectedAlertId] = useState(null);
   const [filterStatus, setFilterStatus] = useState("ALL");
+  const [errorMsg, setErrorMsg] = useState(null);
 
   // Fetch alerts from backend
   const fetchAlerts = async (isManual = false) => {
@@ -32,9 +33,13 @@ export default function SosControlRoom() {
       const json = await res.json();
       if (json.success) {
         setAlerts(json.data);
+        setErrorMsg(null);
+      } else {
+        setErrorMsg(json.message || json.error || "Failed to load alerts");
       }
     } catch (e) {
       console.error("Failed to fetch alerts:", e);
+      setErrorMsg("Network request failed. Ensure backend service is reachable.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -191,6 +196,22 @@ export default function SosControlRoom() {
                 </button>
               ))}
             </div>
+
+            {/* Connection/SRV DNS Error Banner */}
+            {errorMsg && (
+              <div className="mx-4 mt-4 p-3 rounded-lg bg-rose-950/20 border border-rose-500/30 text-rose-400 font-mono text-[9px] leading-relaxed shadow-[0_0_15px_rgba(244,63,94,0.05)] relative overflow-hidden flex flex-col gap-1.5 shrink-0">
+                <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px]">
+                  <ShieldAlert className="w-3.5 h-3.5 animate-pulse text-rose-500" />
+                  Database Connection Error
+                </div>
+                <div className="text-zinc-400 select-all select-text font-mono text-[9px]">
+                  {errorMsg}
+                </div>
+                <div className="text-zinc-500 text-[8px] italic mt-1 border-t border-rose-950/40 pt-1">
+                  Troubleshooting: SRV errors are usually caused by local DNS blocking _mongodb._tcp. Try setting your computer DNS to Google (8.8.8.8) or Cloudflare (1.1.1.1) to unblock the Mongo cluster.
+                </div>
+              </div>
+            )}
 
             {/* Incident Cards list */}
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0">

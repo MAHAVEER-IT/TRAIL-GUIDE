@@ -386,17 +386,27 @@ def create_project_report():
     doc.add_page_break()
 
     # ---------------------------------------------------------------------------
-    # 8. ABSTRACT (PAGE 11)
+    # 8. ABSTRACT (PAGE 11) - Formatted to strictly fit within a single page
     # ---------------------------------------------------------------------------
-    add_title_p("ABSTRACT", font_size=16, bold=True, space_after=18)
+    add_title_p("ABSTRACT", font_size=16, bold=True, space_before=10, space_after=14)
     
-    add_body("Global Navigation Satellite System (GNSS) signal degradation under dense forest canopies presents a critical life-safety hazard to wilderness travelers and Search and Rescue (SAR) personnel. Under thick multi-layered foliage, consumer smartphone satellite receivers experience severe Position Dilution of Precision (PDOP > 6.5) or complete signal blackouts. Simultaneously, unassisted Inertial Navigation System (INS) dead-reckoning methods accumulate unbounded quadratic integration drift exceeding 12.4 meters within minutes. Traditional navigation platforms exacerbate these limitations by requiring massive, multi-gigabyte raster map downloads and constant cellular connectivity.")
+    def add_abstract_p(text):
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.paragraph_format.line_spacing = 1.3
+        p.paragraph_format.space_after = Pt(5)
+        run = p.add_run(text)
+        run.font.name = 'Times New Roman'
+        run.font.size = Pt(12)
+        return p
 
-    add_body("This project presents TrailGuide, an infrastructure-independent wilderness travel and emergency coordination framework engineered for commodity smartphones. TrailGuide introduces a battery-efficient Sensor-Fusion Pedestrian Dead Reckoning (SF-PDR) engine that couples tri-axial accelerometer step kinematics, dynamic Weinberg stride estimation, and a tilt-compensated complementary heading filter fusing gyroscopic angular velocities with magnetometer field vectors. When canopy occlusion causes satellite accuracy to drop below acceptable bounds, the system automatically decouples GNSS updates and propagates spatial coordinates through passive inertial dead-reckoning.")
+    add_abstract_p("Global Navigation Satellite System (GNSS) signal degradation under dense forest canopies presents a critical life-safety hazard to wilderness travelers and Search and Rescue (SAR) teams. Under thick foliage, smartphone GPS signals experience severe Position Dilution of Precision (PDOP > 6.5) or complete signal blackouts, while unassisted Inertial Navigation System (INS) dead-reckoning drifts quadratically beyond 12.4 meters within minutes. Traditional mapping tools worsen these challenges by requiring multi-gigabyte raster map downloads and constant cellular connectivity.")
 
-    add_body("For off-grid emergency signaling, TrailGuide incorporates an infrastructure-less background Bluetooth Low Energy (BLE) Delay-Tolerant Network (DTN). Using a controlled Spray-and-Wait protocol with local Hive database deduplication, 24-byte emergency distress payloads are propagated peer-to-peer across mobile human nodes until encountering an internet-connected gateway. Relayed packets are ingested by a cloud-based Next.js and MongoDB Atlas Search and Rescue command center featuring 2DSphere spatial query perimeters, live incident status management, and Open Source Routing Machine (OSRM) dynamic road routing.")
+    add_abstract_p("This project presents TrailGuide, an infrastructure-independent wilderness travel and emergency coordination framework engineered for commodity smartphones. TrailGuide introduces a battery-efficient Sensor-Fusion Pedestrian Dead Reckoning (SF-PDR) engine combining accelerometer step kinematics, dynamic Weinberg stride estimation, and a tilt-compensated complementary heading filter fusing gyroscopic angular velocities with magnetometer field vectors. When canopy occlusion degrades satellite accuracy beyond 6.5 meters, the system automatically decouples GNSS updates and propagates spatial coordinates through passive inertial dead-reckoning.")
 
-    add_body("Empirical benchmarking across a 2.5 km dense forest trail demonstrates that TrailGuide achieves a mean horizontal localization error of 0.68 meters (94.6% sub-meter accuracy), outperforming raw smartphone GNSS (12.42 m drift) by 94.5% and standard GNSS+INS baselines (4.85 m drift) by 86.0%. The BLE mesh DTN delivers 100% of SOS alerts within 4.2 seconds across 5-hop spans, while consuming only 11.4% CPU capacity and 13.8% battery per hour during continuous operation.")
+    add_abstract_p("For emergency signaling, TrailGuide integrates an infrastructure-less Bluetooth Low Energy (BLE) Delay-Tolerant Network (DTN). Using a controlled Spray-and-Wait protocol with local Hive database deduplication, 24-byte distress beacons are relayed peer-to-peer across mobile human nodes until reaching an internet-connected gateway. Relayed packets are ingested by a cloud-based Next.js and MongoDB Atlas SAR command center featuring 2DSphere spatial queries and dynamic OSRM road routing.")
+
+    add_abstract_p("Field benchmarking across a 2.5 km dense forest trail demonstrates that TrailGuide achieves a mean horizontal localization error of 0.68 meters (94.6% sub-meter accuracy), outperforming raw smartphone GNSS (12.42 m drift) by 94.5% and standard GNSS+INS baselines (4.85 m drift) by 86.0%. The BLE mesh DTN delivers 100% of SOS alerts within 4.2 seconds across 5 hops, while consuming only 11.4% CPU capacity and 13.8% battery per hour during continuous operation.")
 
     doc.add_page_break()
 

@@ -94,17 +94,40 @@ def create_project_report():
         run.font.size = Pt(12)
         return p
 
-    def set_cell_border(cell, **kwargs):
-        tcPr = cell._tc.get_or_add_tcPr()
-        tcBorders = parse_xml(r'''
-            <w:tcBorders {} >
-                <w:top w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
-                <w:left w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
-                <w:bottom w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
-                <w:right w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
-            </w:tcBorders>
-        '''.format(nsdecls('w')))
-        tcPr.append(tcBorders)
+    def apply_table_grid(table, col_widths=None):
+        table.style = 'Table Grid'
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        for i, row in enumerate(table.rows):
+            # prevent row break across pages
+            trPr = row._tr.get_or_add_trPr()
+            trPr.append(parse_xml(r'<w:cantSplit {}/>'.format(nsdecls('w'))))
+            
+            # format cells
+            for j, cell in enumerate(row.cells):
+                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                if col_widths and j < len(col_widths):
+                    cell.width = Inches(col_widths[j])
+                # add cell margins/padding
+                tcPr = cell._tc.get_or_add_tcPr()
+                tcMar = parse_xml(r'''
+                    <w:tcMar {} >
+                        <w:top w:w="120" w:type="dxa"/>
+                        <w:left w:w="160" w:type="dxa"/>
+                        <w:bottom w:w="120" w:type="dxa"/>
+                        <w:right w:w="160" w:type="dxa"/>
+                    </w:tcMar>
+                '''.format(nsdecls('w')))
+                tcPr.append(tcMar)
+                # set borders explicitly to guarantee lines render
+                tcBorders = parse_xml(r'''
+                    <w:tcBorders {} >
+                        <w:top w:val="single" w:sz="6" w:space="0" w:color="000000"/>
+                        <w:left w:val="single" w:sz="6" w:space="0" w:color="000000"/>
+                        <w:bottom w:val="single" w:sz="6" w:space="0" w:color="000000"/>
+                        <w:right w:val="single" w:sz="6" w:space="0" w:color="000000"/>
+                    </w:tcBorders>
+                '''.format(nsdecls('w')))
+                tcPr.append(tcBorders)
 
     # ---------------------------------------------------------------------------
     # 1. COVER PAGE (PAGE 1)
@@ -124,9 +147,9 @@ def create_project_report():
 
     add_title_p("Submitted by", font_size=12, bold=True, space_after=8)
     add_title_p("AKASH DHANKAR      722823205003", font_size=12, bold=True, space_after=3)
-    add_title_p("LINGESH V          722823205030", font_size=12, bold=True, space_after=3)
-    add_title_p("MAHAVEER K         722823205031", font_size=12, bold=True, space_after=3)
-    add_title_p("SARAVANAN K        722823205048", font_size=12, bold=True, space_after=16)
+    add_title_p("LINGESH V          722823205027", font_size=12, bold=True, space_after=3)
+    add_title_p("MAHAVEER K         722823205028", font_size=12, bold=True, space_after=3)
+    add_title_p("SARAVANAN K        722823205045", font_size=12, bold=True, space_after=16)
 
     add_title_p("BATCH: 2023 – 2027", font_size=12, bold=True, space_after=24)
 
@@ -153,7 +176,7 @@ def create_project_report():
     add_title_p("BACHELOR OF TECHNOLOGY IN INFORMATION TECHNOLOGY", font_size=13, bold=True, space_after=18)
     add_title_p("PHASE : I\nNov/Dec 2026", font_size=12, bold=True, space_after=24)
     add_title_p("Submitted by", font_size=12, bold=True, space_after=8)
-    add_title_p("AKASH DHANKAR (722823205003)\nLINGESH V (722823205030)\nMAHAVEER K (722823205031)\nSARAVANAN K (722823205048)", font_size=12, bold=True, space_after=18)
+    add_title_p("AKASH DHANKAR (722823205003)\nLINGESH V (722823205027)\nMAHAVEER K (722823205028)\nSARAVANAN K (722823205045)", font_size=12, bold=True, space_after=18)
     add_title_p("BATCH: 2023 – 2027", font_size=12, bold=True, space_after=24)
     add_title_p("Under the Guidance of\nDr. D. Saranya, M.E., Ph.D.\nAssistant Professor, Department of Information Technology", font_size=12, bold=True, space_after=28)
     add_title_p("Sri Eshwar College of Engineering (Autonomous)\nCoimbatore - 641 202, Tamil Nadu", font_size=12, bold=True)
@@ -167,7 +190,7 @@ def create_project_report():
 
     add_body("Certified that this Report titled \"TrailGuide: An Offline Navigation and BLE Mesh-Based Emergency SOS Communication System for Wilderness Safety\" is the bonafide work of:")
     
-    add_title_p("AKASH DHANKAR                 722823205003\nLINGESH V                     722823205030\nMAHAVEER K                    722823205031\nSARAVANAN K                   722823205048", 
+    add_title_p("AKASH DHANKAR                 722823205003\nLINGESH V                     722823205027\nMAHAVEER K                    722823205028\nSARAVANAN K                   722823205045", 
                 font_size=12, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_before=12, space_after=18)
     
     add_body("who carried out the project work under my supervision.\n\n")
@@ -265,7 +288,7 @@ def create_project_report():
     # ---------------------------------------------------------------------------
     add_title_p("DECLARATION", font_size=16, bold=True, space_before=10, space_after=20)
     add_body("We,")
-    add_title_p("AKASH DHANKAR (722823205003)\nLINGESH V (722823205030)\nMAHAVEER K (722823205031)\nSARAVANAN K (722823205048)", 
+    add_title_p("AKASH DHANKAR (722823205003)\nLINGESH V (722823205027)\nMAHAVEER K (722823205028)\nSARAVANAN K (722823205045)", 
                 font_size=12, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=18)
     
     add_body("declare that the project entitled \"TrailGuide: An Offline Navigation and BLE Mesh-Based Emergency SOS Communication System for Wilderness Safety\", submitted in partial fulfilment to Anna University as the project work of Bachelor of Technology (Information Technology) Degree, is a record of original work done by us under the supervision and guidance of Dr. D. Saranya, M.E., Ph.D., Assistant Professor, Department of Information Technology, Sri Eshwar College of Engineering, Coimbatore.\n")
@@ -340,17 +363,11 @@ def create_project_report():
     ]
 
     table_toc = doc.add_table(rows=1, cols=3)
-    table_toc.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table_toc.autofit = False
-    
     hdr_cells = table_toc.rows[0].cells
     hdr_cells[0].paragraphs[0].add_run("CHAPTER NO.").bold = True
     hdr_cells[1].paragraphs[0].add_run("TITLE").bold = True
     hdr_cells[2].paragraphs[0].add_run("PAGE NO.").bold = True
-    hdr_cells[0].width = Inches(1.5)
-    hdr_cells[1].width = Inches(4.2)
-    hdr_cells[2].width = Inches(1.0)
-
+    
     for item, pg in toc_data:
         row = table_toc.add_row()
         parts = item.split(" ", 1)
@@ -363,6 +380,8 @@ def create_project_report():
             c1.paragraphs[0].add_run(item)
         c2.paragraphs[0].add_run(pg)
         c2.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+    apply_table_grid(table_toc, [1.4, 4.3, 0.9])
 
     doc.add_page_break()
 
@@ -405,6 +424,7 @@ def create_project_report():
         r.cells[0].paragraphs[0].add_run(f_id)
         r.cells[1].paragraphs[0].add_run(f_t)
         r.cells[2].paragraphs[0].add_run(f_p).alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    apply_table_grid(t_f, [1.4, 4.3, 0.9])
 
     add_title_p("\nLIST OF TABLES", font_size=16, bold=True, space_before=14, space_after=14)
     tbls = [
@@ -423,6 +443,7 @@ def create_project_report():
         r.cells[0].paragraphs[0].add_run(t_id)
         r.cells[1].paragraphs[0].add_run(t_t_name)
         r.cells[2].paragraphs[0].add_run(t_p).alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    apply_table_grid(t_t, [1.4, 4.3, 0.9])
 
     doc.add_page_break()
 
@@ -454,6 +475,7 @@ def create_project_report():
         r = t_a.add_row()
         r.cells[0].paragraphs[0].add_run(abb)
         r.cells[1].paragraphs[0].add_run(exp)
+    apply_table_grid(t_a, [2.0, 4.6])
 
     doc.add_page_break()
 
@@ -565,6 +587,7 @@ def create_project_report():
         r = t_hw.add_row()
         r.cells[0].paragraphs[0].add_run(c)
         r.cells[1].paragraphs[0].add_run(s)
+    apply_table_grid(t_hw, [2.2, 4.4])
 
     add_heading_2("\n4.2 SOFTWARE REQUIREMENTS")
     t_sw = doc.add_table(rows=1, cols=2)
@@ -588,6 +611,7 @@ def create_project_report():
         r = t_sw.add_row()
         r.cells[0].paragraphs[0].add_run(c)
         r.cells[1].paragraphs[0].add_run(s)
+    apply_table_grid(t_sw, [2.2, 4.4])
 
     doc.add_page_break()
 
@@ -698,6 +722,7 @@ def create_project_report():
         r.cells[2].paragraphs[0].add_run(ma)
         r.cells[3].paragraphs[0].add_run(d)
         r.cells[4].paragraphs[0].add_run(s)
+    apply_table_grid(t_perf, [2.2, 1.1, 1.1, 1.1, 1.1])
 
     add_body("\nTrailGuide achieves a mean localization error of 0.68 meters with a 94.6% sub-meter accuracy rate, outperforming raw GNSS by 94.5% and standard INS dead reckoning by 86.0%.")
 
@@ -790,10 +815,17 @@ def create_project_report():
 
     # Save Word document
     output_docx_path = os.path.join(os.path.dirname(__file__), "TrailGuide_Phase1_Project_Report.docx")
-    doc.save(output_docx_path)
-    print("=" * 80)
-    print(f"SUCCESS: Report generated successfully at:\n{output_docx_path}")
-    print("=" * 80)
+    try:
+        doc.save(output_docx_path)
+        print("=" * 80)
+        print(f"SUCCESS: Report generated successfully at:\n{output_docx_path}")
+        print("=" * 80)
+    except PermissionError:
+        alt_path = os.path.join(os.path.dirname(__file__), "TrailGuide_Phase1_Project_Report_Updated.docx")
+        doc.save(alt_path)
+        print("=" * 80)
+        print(f"NOTICE: Primary file was locked in Word. Saved updated report at:\n{alt_path}")
+        print("=" * 80)
 
 if __name__ == "__main__":
     create_project_report()

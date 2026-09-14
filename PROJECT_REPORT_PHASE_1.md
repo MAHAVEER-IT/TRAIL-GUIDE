@@ -10,9 +10,9 @@ OF ANNA UNIVERSITY
 
 ### Submitted by:
 * **AKASH DHANKAR** — `722823205003`
-* **LINGESH V** — `722823205030`
-* **MAHAVEER K** — `722823205031`
-* **SARAVANAN K** — `722823205048`
+* **LINGESH V** — `722823205027`
+* **MAHAVEER K** — `722823205028`
+* **SARAVANAN K** — `722823205045`
 
 **BATCH: 2023 – 2027**
 
@@ -31,9 +31,9 @@ Approved by AICTE, New Delhi and Affiliated to Anna University, Chennai
 Certified that this Report titled **"TrailGuide: An Offline Navigation and BLE Mesh-Based Emergency SOS Communication System for Wilderness Safety"** is the bonafide work of:
 
 * **AKASH DHANKAR** (`722823205003`)
-* **LINGESH V** (`722823205030`)
-* **MAHAVEER K** (`722823205031`)
-* **SARAVANAN K** (`722823205048`)
+* **LINGESH V** (`722823205027`)
+* **MAHAVEER K** (`722823205028`)
+* **SARAVANAN K** (`722823205045`)
 
 who carried out the project work under my supervision.
 
@@ -108,7 +108,7 @@ To groom students into globally competent IT professionals and meet the ever cha
 
 ## DECLARATION
 
-We, **AKASH DHANKAR** (`722823205003`), **LINGESH V** (`722823205030`), **MAHAVEER K** (`722823205031`), and **SARAVANAN K** (`722823205048`), declare that the project entitled **"TrailGuide: An Offline Navigation and BLE Mesh-Based Emergency SOS Communication System for Wilderness Safety"**, submitted in partial fulfilment to Anna University as the project work of Bachelor of Technology (Information Technology) Degree, is a record of original work done by us under the supervision and guidance of **Dr. D. Saranya, M.E., Ph.D.**, Assistant Professor, Department of Information Technology, Sri Eshwar College of Engineering, Coimbatore.
+We, **AKASH DHANKAR** (`722823205003`), **LINGESH V** (`722823205027`), **MAHAVEER K** (`722823205028`), and **SARAVANAN K** (`722823205045`), declare that the project entitled **"TrailGuide: An Offline Navigation and BLE Mesh-Based Emergency SOS Communication System for Wilderness Safety"**, submitted in partial fulfilment to Anna University as the project work of Bachelor of Technology (Information Technology) Degree, is a record of original work done by us under the supervision and guidance of **Dr. D. Saranya, M.E., Ph.D.**, Assistant Professor, Department of Information Technology, Sri Eshwar College of Engineering, Coimbatore.
 
 Place: Coimbatore  
 Date:  

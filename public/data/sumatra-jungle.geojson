@@ -1,0 +1,229 @@
+{
+  "type": "FeatureCollection",
+  "name": "Sumatra_Deep_Forest_Canopy_Vector_Map",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_basecamp_sector_01",
+        "name": "Sector 01 Basecamp",
+        "category": "basecamp"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.400600, 4.537500]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_river_crossing_alpha",
+        "name": "River Crossing Alpha",
+        "category": "crossing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.402100, 4.538900]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_canopy_beacon_01",
+        "name": "Lidar Mesh Relay 01",
+        "category": "relay"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.403800, 4.539800]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_ridge_crest",
+        "name": "Ridge Crest Observation Point",
+        "category": "landmark"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.405200, 4.541200]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_transceiver_hub",
+        "name": "ISM 868MHz Transceiver Hub",
+        "category": "comm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.404100, 4.536800]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_waterfall_pass",
+        "name": "Batu Waterfall Pass",
+        "category": "natural"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.398900, 4.536100]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_dense_canopy_gate",
+        "name": "High-Canopy Occlusion Boundary",
+        "category": "boundary"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.401800, 4.535500]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_ranger_outpost",
+        "name": "Forest Ranger Shelter",
+        "category": "shelter"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.397200, 4.538200]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_river_crossing_beta",
+        "name": "River Crossing Beta",
+        "category": "crossing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.406500, 4.542800]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "node_extraction_lz",
+        "name": "Emergency Extraction LZ",
+        "category": "extraction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.408200, 4.544100]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "path_basecamp_to_river_alpha",
+        "name": "Trail: Basecamp to River Crossing Alpha",
+        "type": "trail"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [101.400600, 4.537500],
+          [101.401100, 4.538100],
+          [101.401700, 4.538500],
+          [101.402100, 4.538900]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "path_river_alpha_to_canopy_beacon",
+        "name": "Trail: River Alpha to Lidar Mesh Relay",
+        "type": "trail"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [101.402100, 4.538900],
+          [101.402800, 4.539300],
+          [101.403400, 4.539600],
+          [101.403800, 4.539800]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "path_canopy_beacon_to_ridge_crest",
+        "name": "Trail: Lidar Relay to Ridge Crest",
+        "type": "trail"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [101.403800, 4.539800],
+          [101.404400, 4.540400],
+          [101.404900, 4.540900],
+          [101.405200, 4.541200]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "path_ridge_crest_to_extraction_lz",
+        "name": "Trail: Ridge Crest to Extraction Landing Zone",
+        "type": "trail"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [101.405200, 4.541200],
+          [101.405800, 4.542000],
+          [101.406500, 4.542800],
+          [101.407400, 4.543500],
+          [101.408200, 4.544100]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "path_basecamp_to_waterfall_pass",
+        "name": "Trail: Basecamp to Batu Waterfall Pass",
+        "type": "trail"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [101.400600, 4.537500],
+          [101.399900, 4.537000],
+          [101.399300, 4.536500],
+          [101.398900, 4.536100]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "path_waterfall_to_ranger_outpost",
+        "name": "Trail: Waterfall to Ranger Shelter",
+        "type": "trail"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [101.398900, 4.536100],
+          [101.398200, 4.537000],
+          [101.397700, 4.537600],
+          [101.397200, 4.538200]
+        ]
+      }
+    }
+  ]
+}

@@ -12,6 +12,30 @@ const EmergencyAlertSchema = new mongoose.Schema(
       type: String,
       required: [true, "senderDeviceId is required"],
     },
+    hikerName: {
+      type: String,
+      default: "Hiker Beacon",
+    },
+    emergencyType: {
+      type: String,
+      default: "Wilderness Distress",
+    },
+    sector: {
+      type: String,
+      default: "Sector 7 (SECE Trail)",
+    },
+    batteryLevel: {
+      type: Number,
+      default: 75,
+    },
+    stepCount: {
+      type: Number,
+      default: 3200,
+    },
+    assignedTeam: {
+      type: String,
+      default: "Unassigned",
+    },
     relayDeviceId: {
       type: String,
       required: false,
@@ -49,6 +73,7 @@ const EmergencyAlertSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    strict: false,
   }
 );
 

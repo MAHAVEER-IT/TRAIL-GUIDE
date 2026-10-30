@@ -239,7 +239,7 @@ export default function ExploreGateway() {
             NO SECTOR MATCH: "{searchQuery}"
           </div>
           <p className="font-sans text-xs text-zinc-500 max-w-xs leading-normal">
-            The search query did not match any active localized vector caches in the TerraSafe offline registry.
+            The search query did not match any active localized vector caches in the Trail Guide offline registry.
           </p>
           <button 
             onClick={() => setSearchQuery("")}

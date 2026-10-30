@@ -173,7 +173,7 @@ export default async function DestinationDetail({ params }) {
 
             {/* Custom Interactive Leaflet Map */}
             <div className="w-full aspect-video rounded-xl border border-zinc-800/80 bg-[#080808] relative overflow-hidden">
-              <InteractiveMap lat={dest.lat} lng={dest.lng} name={dest.name} />
+              <InteractiveMap lat={dest.lat} lng={dest.lng} name={dest.name} sectorId={dest.id} />
             </div>
           </div>
 

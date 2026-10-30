@@ -641,7 +641,7 @@ export default function Home() {
         {/* Bottom footer HUD bar */}
         <div className="w-full flex justify-end items-center p-4 bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent pointer-events-auto">
           <div className="font-mono text-[10px] text-zinc-500">
-            © TERRASAFE SYSTEMS INC.
+            © TRAIL GUIDE SYSTEMS INC.
           </div>
         </div>
       </div>
@@ -804,7 +804,7 @@ export default function Home() {
             </h2>
             <div className="w-24 h-[1px] bg-zinc-800 my-2" />
             <p className="font-mono text-xs md:text-sm text-zinc-400 max-w-xl leading-relaxed tracking-wide">
-              No networks. No cloud handshakes. TerraSafe runs entirely on-device, storing complex vector tiles locally and computing real-time step kinematic coordinates on local hardware. Absolute offline autonomy.
+              No networks. No cloud handshakes. Trail Guide runs entirely on-device, storing complex vector tiles locally and computing real-time step kinematic coordinates on local hardware. Absolute offline autonomy.
             </p>
             <div className="font-mono text-[10px] text-zinc-500 flex gap-4 mt-4 uppercase">
               <div>MAP STORAGE: <span className="text-cyan-400">SUMATRA_CANOPY.TSM (1.84MB)</span></div>

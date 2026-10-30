@@ -20,7 +20,7 @@ const sansFont = Inter({
 });
 
 export const metadata = {
-  title: "TerraSafe // Off-Grid Navigation Engine",
+  title: "Trail Guide // Off-Grid Navigation Engine",
   description: "Tactical, infrastructure-less navigation ecosystem for extreme, off-grid environments.",
 };
 

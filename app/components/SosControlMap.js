@@ -152,6 +152,44 @@ export default function SosControlMap({
     circlesGroup.clearLayers();
     markerMapRef.current = {};
 
+    // Edge Case: If database has 0 active alerts, render Incident Command HQ Base Station
+    if (alerts.length === 0) {
+      const baseLat = 10.82804;
+      const baseLng = 77.06054;
+      const baseIcon = L.divIcon({
+        html: `
+          <div class="relative flex items-center justify-center cursor-pointer select-none" style="width: 44px; height: 44px;">
+            <div class="absolute inset-0 rounded-full border border-cyan-400/30 animate-ping" style="animation-duration: 3s;"></div>
+            <div class="relative z-10 w-4 h-4 rounded-full bg-cyan-400 border-2 border-slate-950 flex items-center justify-center shadow-[0_0_12px_#22d3ee]">
+              <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+            </div>
+            <div class="absolute -bottom-4 font-mono font-bold tracking-widest text-[8px] px-1.5 py-0.2 rounded bg-slate-950/90 border border-cyan-500/30 text-cyan-300 shadow-md whitespace-nowrap z-20 pointer-events-none">
+              BASE HQ (SECE)
+            </div>
+          </div>
+        `,
+        className: "tactical-base-hq",
+        iconSize: [44, 44],
+        iconAnchor: [22, 22],
+        popupAnchor: [0, -20],
+      });
+
+      const baseMarker = L.marker([baseLat, baseLng], { icon: baseIcon });
+      baseMarker.bindPopup(`
+        <div style="font-family: monospace; width: 240px; padding: 10px; background: #080c14; border-radius: 8px; color: #e2e8f0;">
+          <div style="display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #1e293b; padding-bottom: 6px; margin-bottom: 6px;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22d3ee; box-shadow: 0 0 8px #22d3ee;"></span>
+            <strong style="color: #ffffff; font-size: 11px;">BASE STATION HQ</strong>
+          </div>
+          <div style="font-size: 9px; color: #94a3b8; margin-bottom: 4px;">COCKPIT: SECE COMMAND SECTOR</div>
+          <div style="font-size: 9px; color: #10b981; font-weight: bold;">● DTN MESH GATEWAY ACTIVE</div>
+          <div style="font-size: 8px; color: #64748b; margin-top: 4px;">STANDBY FOR INBOUND BLE DISTRESS PACKETS</div>
+        </div>
+      `);
+      markersGroup.addLayer(baseMarker);
+      return;
+    }
+
     alerts.forEach((alert) => {
       if (!alert.location || !alert.location.coordinates) return;
       const [lng, lat] = alert.location.coordinates;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { 
   Radio, 
   ShieldAlert, 
+  ShieldCheck,
   CheckCircle2, 
   Clock, 
   Loader2, 
@@ -12,22 +13,18 @@ import {
   Activity, 
   RefreshCw, 
   ArrowLeft,
-  BellRing,
   Copy,
   Check,
   Volume2,
   VolumeX,
-  PlusCircle,
-  Compass,
   Footprints,
   Mountain,
   Wifi,
-  User,
   Search,
-  ExternalLink,
   Cpu,
   Zap,
-  Battery
+  Battery,
+  Trash2
 } from "lucide-react";
 import SosControlMap from "../components/SosControlMap";
 
@@ -35,6 +32,8 @@ export default function SosControlRoom() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [dbConnected, setDbConnected] = useState(false);
   const [selectedAlertId, setSelectedAlertId] = useState(null);
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [filterSector, setFilterSector] = useState("ALL");
@@ -42,7 +41,6 @@ export default function SosControlRoom() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [copiedId, setCopiedId] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [missionClock, setMissionClock] = useState({ utc: "", local: "" });
   const [recentDtnLogs, setRecentDtnLogs] = useState([]);
 
@@ -88,7 +86,7 @@ export default function SosControlRoom() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch alerts from backend API
+  // Fetch alerts 100% dynamically from MongoDB Atlas
   const fetchAlerts = async (isManual = false) => {
     if (isManual) setRefreshing(true);
     try {
@@ -96,45 +94,59 @@ export default function SosControlRoom() {
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setAlerts(json.data);
-        setIsDemoMode(json.source === "TACTICAL_CACHE");
+        setDbConnected(true);
         setErrorMsg(null);
 
-        // If no incident is selected, select the first active one
-        if (!selectedAlertId && json.data.length > 0) {
-          const firstActive = json.data.find(a => a.status === "ACTIVE") || json.data[0];
-          setSelectedAlertId(firstActive.sosId);
+        // Keep or update selected alert
+        if (json.data.length > 0) {
+          if (!selectedAlertId || !json.data.some(a => a.sosId === selectedAlertId)) {
+            const firstActive = json.data.find(a => a.status === "ACTIVE") || json.data[0];
+            setSelectedAlertId(firstActive.sosId);
+          }
+        } else {
+          setSelectedAlertId(null);
         }
       } else {
-        setErrorMsg(json.message || "Unable to retrieve emergency alerts");
+        setDbConnected(false);
+        setErrorMsg(json.message || json.error || "Unable to retrieve emergency alerts from database.");
       }
     } catch (e) {
-      console.error("Failed to fetch alerts:", e);
-      setErrorMsg("Cluster DNS sync pending. Active DTN telemetry fallback active.");
+      console.error("Failed to fetch alerts from MongoDB:", e);
+      setDbConnected(false);
+      setErrorMsg("Database connection error: Could not reach MongoDB Atlas cluster.");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-  // Poll for live distress telemetry every 5 seconds
+  // Poll database every 5 seconds for live inbound distress telemetry
   useEffect(() => {
     fetchAlerts();
     const interval = setInterval(() => fetchAlerts(), 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Generate DTN Packet Log Stream
+  // Generate DTN Packet Log Stream based on real alerts count
   useEffect(() => {
-    const logs = [
-      `[${missionClock.local || 'LIVE'}] BLE_ADV_IND: INGESTED RAW DTN PACKET VIA GATEWAY_01 (CRC32: PASS)`,
-      `[${missionClock.local || 'LIVE'}] MESH TOPOLOGY: 8 ACTIVE RELAY NODES WITHIN AD-HOC RADIUS`,
-      `[${missionClock.local || 'LIVE'}] 2DSPHERE SPATIAL INDEX: EPSG:3857 BUFFER LOCK CONFIRMED`,
-      `[${missionClock.local || 'LIVE'}] STORE-AND-FORWARD: LOCAL OFFLINE CACHE SYNCED WITH CLUSTER`,
-    ];
-    setRecentDtnLogs(logs);
-  }, [missionClock.local]);
+    const time = missionClock.local || 'LIVE';
+    if (alerts.length > 0) {
+      const active = alerts.filter(a => a.status === "ACTIVE").length;
+      setRecentDtnLogs([
+        `[${time}] BLE_ADV_IND: INGESTED RAW DTN PACKETS • ${alerts.length} ALERTS IN DATABASE (${active} ACTIVE)`,
+        `[${time}] MESH TOPOLOGY: 8 ACTIVE RELAY NODES LISTENING • 2DSPHERE SPATIAL INDEX OK`,
+        `[${time}] STORE-AND-FORWARD: MESH BUFFER SYNCED WITH MONGODB ATLAS CLUSTER`,
+      ]);
+    } else {
+      setRecentDtnLogs([
+        `[${time}] BLE_ADV_IND: STANDBY ON FREQUENCY 2.402 GHz • 0 ACTIVE DISTRESS SIGNALS REPORTED`,
+        `[${time}] MESH TOPOLOGY: AD-HOC GATEWAYS READY • ZERO EMERGENCY PACKETS IN BUFFER`,
+        `[${time}] 2DSPHERE SPATIAL INDEX: EPSG:3857 BUFFER LOCK STANDBY`,
+      ]);
+    }
+  }, [missionClock.local, alerts]);
 
-  // Update Status of an Incident
+  // Update Status of an Incident dynamically in MongoDB Atlas
   const updateAlertStatus = async (sosId, newStatus) => {
     try {
       // Optimistic update for zero-latency UI feel
@@ -152,18 +164,19 @@ export default function SosControlRoom() {
         fetchAlerts();
       }
     } catch (e) {
-      console.error("Failed to update status:", e);
+      console.error("Failed to update status in database:", e);
     }
   };
 
-  // Simulate a live SOS Distress Packet (Evaluator Demo Mode)
-  const simulateNewDistressBeacon = async () => {
+  // Transmit a real test SOS beacon to MongoDB Atlas (100% Dynamic DB Write)
+  const transmitTestSosToDatabase = async () => {
+    setActionLoading(true);
     playTacticalChime();
-    const randomId = `SOS-SIM-${Math.floor(1000 + Math.random() * 9000)}`;
+    const randomId = `SOS-LIVE-${Math.floor(1000 + Math.random() * 9000)}`;
     const randomOffsets = [
-      { name: "Sector 7 (SECE Trail North)", coords: [77.0612, 10.8291], alt: 345.2, hiker: "Arun K. (Scout 2)" },
-      { name: "Sector 7 (SECE Perimeter West)", coords: [77.0588, 10.8274], alt: 339.0, hiker: "Priya V. (Field Lead)" },
-      { name: "Sector 4 (Nilgiris Escarpment)", coords: [76.7145, 11.4120], alt: 2260.5, hiker: "David R. (Hiker)" },
+      { name: "Sector 7 (SECE Perimeter)", coords: [77.06054 + (Math.random() - 0.5) * 0.006, 10.82804 + (Math.random() - 0.5) * 0.006], alt: 342.5, hiker: "Arun K. (Lead Scout)" },
+      { name: "Sector 4 (Nilgiris Escarpment)", coords: [76.71130 + (Math.random() - 0.5) * 0.008, 11.41020 + (Math.random() - 0.5) * 0.008], alt: 2240.0, hiker: "David R. (Alpine Trekker)" },
+      { name: "Sector 9 (Sumatra Rainforest)", coords: [101.34310 + (Math.random() - 0.5) * 0.008, 0.78930 + (Math.random() - 0.5) * 0.008], alt: 418.0, hiker: "Dr. Thorne (Field Ecologist)" },
     ];
     const pick = randomOffsets[Math.floor(Math.random() * randomOffsets.length)];
 
@@ -171,12 +184,12 @@ export default function SosControlRoom() {
       sosId: randomId,
       senderDeviceId: `DEV-${Math.floor(200 + Math.random() * 800)}`,
       hikerName: pick.hiker,
-      emergencyType: "UNRESPONSIVE / SF-PDR SUDDEN DROP DETECTED",
+      emergencyType: "CRITICAL DISTRESS / SUDDEN SF-PDR KINEMATIC DROP DETECTED",
       sector: pick.name,
-      batteryLevel: Math.floor(12 + Math.random() * 25),
+      batteryLevel: Math.floor(14 + Math.random() * 25),
       stepCount: Math.floor(6500 + Math.random() * 5000),
       assignedTeam: "SAR RAPID TEAM ALPHA",
-      relayDeviceId: "NODE-RELAY-03",
+      relayDeviceId: "NODE-GATEWAY-04",
       location: {
         type: "Point",
         coordinates: pick.coords,
@@ -193,14 +206,32 @@ export default function SosControlRoom() {
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (json.success) {
-        setAlerts(prev => [json.data, ...prev]);
+      if (json.success && json.data) {
+        await fetchAlerts();
         setSelectedAlertId(json.data.sosId);
       }
     } catch (e) {
-      // Direct local state injection if API request fails
-      setAlerts(prev => [payload, ...prev]);
-      setSelectedAlertId(payload.sosId);
+      console.error("Failed to insert alert into MongoDB:", e);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Purge all alerts from MongoDB Atlas to test empty state
+  const purgeAllAlerts = async () => {
+    if (!window.confirm("Purge all emergency alerts from MongoDB Atlas to reset database to 0?")) return;
+    setActionLoading(true);
+    try {
+      const res = await fetch("/api/sos?all=true", { method: "DELETE" });
+      const json = await res.json();
+      if (json.success) {
+        setAlerts([]);
+        setSelectedAlertId(null);
+      }
+    } catch (e) {
+      console.error("Failed to purge alerts:", e);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -213,7 +244,7 @@ export default function SosControlRoom() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Filtered Alerts List
+  // Filtered Alerts List (Dynamic based on MongoDB records)
   const filteredAlerts = useMemo(() => {
     return alerts.filter((alert) => {
       // Status Filter
@@ -230,7 +261,7 @@ export default function SosControlRoom() {
       // Search Query
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
-        const matchesId = alert.sosId.toLowerCase().includes(query);
+        const matchesId = (alert.sosId || "").toLowerCase().includes(query);
         const matchesSender = (alert.senderDeviceId || "").toLowerCase().includes(query);
         const matchesHiker = (alert.hikerName || "").toLowerCase().includes(query);
         const matchesSector = (alert.sector || "").toLowerCase().includes(query);
@@ -241,7 +272,7 @@ export default function SosControlRoom() {
     });
   }, [alerts, filterStatus, filterSector, searchQuery]);
 
-  // Aggregate Telemetry
+  // Aggregate Telemetry from real MongoDB records
   const activeCount = alerts.filter(a => a.status === "ACTIVE").length;
   const ackCount = alerts.filter(a => a.status === "ACKNOWLEDGED").length;
   const resolvedCount = alerts.filter(a => a.status === "RESOLVED").length;
@@ -272,23 +303,27 @@ export default function SosControlRoom() {
 
           <div className="flex items-center gap-2">
             <div className="relative flex items-center justify-center">
-              <Radio className="w-4 h-4 text-rose-500 animate-pulse" />
-              <span className="absolute w-6 h-6 rounded-full bg-rose-500/20 animate-ping pointer-events-none" />
+              <Radio className={`w-4 h-4 ${activeCount > 0 ? 'text-rose-500 animate-pulse' : 'text-emerald-400'}`} />
+              {activeCount > 0 && (
+                <span className="absolute w-6 h-6 rounded-full bg-rose-500/20 animate-ping pointer-events-none" />
+              )}
             </div>
             <div>
               <h1 className="font-mono text-xs md:text-sm font-black tracking-[0.2em] text-white flex items-center gap-2">
                 SEARCH & RESCUE INCIDENT COMMAND ROOM
               </h1>
               <div className="flex items-center gap-2 font-mono text-[8px] text-slate-400">
-                <span className="text-rose-400 font-bold">DTN MESH PROTOCOL v2.4</span>
+                <span className={activeCount > 0 ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
+                  {activeCount > 0 ? `${activeCount} ACTIVE DISTRESS INCIDENT(S)` : "ALL SECTORS SECURE • STANDBY"}
+                </span>
                 <span>•</span>
-                <span className="text-emerald-400">ENCRYPTED BLE AD-HOC TELEMETRY</span>
+                <span className="text-cyan-400">BLE DTN MESH v2.4</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right: Mission Time, Cluster Status & Simulator Action */}
+        {/* Right: Mission Time, Live Database Status & Actions */}
         <div className="flex items-center gap-2 md:gap-3">
           {/* Mission Zulu Clock */}
           <div className="hidden lg:flex flex-col items-end font-mono text-[9px] bg-slate-950/80 border border-slate-800/80 px-3 py-1 rounded-lg">
@@ -302,14 +337,16 @@ export default function SosControlRoom() {
             </div>
           </div>
 
-          {/* Database / DTN Cluster Status Badge */}
+          {/* Database Live Sync Status Badge */}
           <div className={`hidden sm:flex items-center gap-1.5 font-mono text-[9px] px-2.5 py-1 rounded-lg border ${
-            isDemoMode
-              ? "bg-amber-950/20 border-amber-500/30 text-amber-300"
-              : "bg-emerald-950/20 border-emerald-500/30 text-emerald-300"
+            dbConnected
+              ? "bg-emerald-950/20 border-emerald-500/30 text-emerald-300"
+              : "bg-rose-950/20 border-rose-500/30 text-rose-300"
           }`}>
-            <span className={`w-2 h-2 rounded-full ${isDemoMode ? "bg-amber-400 animate-pulse" : "bg-emerald-400 animate-ping"}`} />
-            <span className="font-bold">{isDemoMode ? "DTN SIMULATION FALLBACK" : "LIVE MONGO CLUSTER"}</span>
+            <span className={`w-2 h-2 rounded-full ${dbConnected ? "bg-emerald-400 animate-ping" : "bg-rose-500"}`} />
+            <span className="font-bold">
+              {dbConnected ? "MONGO ATLAS DYNAMIC" : "DATABASE ERROR"}
+            </span>
           </div>
 
           {/* Audio Chime Toggle */}
@@ -325,94 +362,140 @@ export default function SosControlRoom() {
             {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
 
-          {/* ⚡ SIMULATE SOS PACKET BUTTON (Key Evaluator Interactive Feature) */}
+          {/* Dynamic Database SOS Action */}
           <button
-            onClick={simulateNewDistressBeacon}
-            className="font-mono text-[9px] md:text-[10px] font-black px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white border border-rose-400/30 shadow-[0_0_15px_rgba(244,63,94,0.35)] hover:shadow-[0_0_20px_rgba(244,63,94,0.5)] transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            onClick={transmitTestSosToDatabase}
+            disabled={actionLoading}
+            className="font-mono text-[9px] md:text-[10px] font-black px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white border border-rose-400/30 shadow-[0_0_15px_rgba(244,63,94,0.35)] hover:shadow-[0_0_20px_rgba(244,63,94,0.5)] transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
+            title="Writes a real emergency alert into MongoDB Atlas"
           >
-            <Zap className="w-3.5 h-3.5 text-amber-300 animate-bounce" />
-            <span className="tracking-wider">TRANSMIT SOS BEACON</span>
+            <Zap className="w-3.5 h-3.5 text-amber-300" />
+            <span className="tracking-wider">
+              {actionLoading ? "WRITING TO DB..." : "TRANSMIT SOS TO DB"}
+            </span>
           </button>
+
+          {/* Purge Database Button (Visible if alerts exist) */}
+          {alerts.length > 0 && (
+            <button
+              onClick={purgeAllAlerts}
+              disabled={actionLoading}
+              className="p-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-500 hover:text-rose-400 hover:border-rose-500/40 transition-all cursor-pointer shadow-md"
+              title="Delete all records from MongoDB Atlas (Reset to 0)"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
 
           {/* Manual Refresh Button */}
           <button 
             onClick={() => fetchAlerts(true)}
             className="p-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 hover:text-sky-400 hover:border-sky-500/40 transition-all cursor-pointer shadow-md"
             disabled={refreshing}
-            title="Refresh Inbound Telemetry"
+            title="Poll MongoDB Atlas for latest records"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-sky-400' : ''}`} />
           </button>
         </div>
       </header>
 
-      {/* TACTICAL KPI METRICS STRIP */}
+      {/* TACTICAL KPI METRICS STRIP (100% Dynamic Values) */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3 px-4 md:px-6 bg-[#070b16]/70 border-b border-slate-800/80 z-20">
-        {/* Metric 1: Active Distresses (P1 Crimson) */}
-        <div className="bg-gradient-to-br from-rose-950/20 to-slate-950/80 border border-rose-500/30 rounded-xl p-3 flex flex-col justify-between shadow-[0_0_20px_rgba(239,68,68,0.06)] relative overflow-hidden group">
+        {/* Metric 1: Active Distresses */}
+        <div className={`border rounded-xl p-3 flex flex-col justify-between relative overflow-hidden group ${
+          activeCount > 0 
+            ? "bg-gradient-to-br from-rose-950/20 to-slate-950/80 border-rose-500/30 shadow-[0_0_20px_rgba(239,68,68,0.06)]"
+            : "bg-slate-950/60 border-slate-800/80"
+        }`}>
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[9px] text-rose-300 tracking-wider font-bold uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+            <span className="font-mono text-[9px] text-slate-300 tracking-wider font-bold uppercase flex items-center gap-1.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${activeCount > 0 ? 'bg-rose-500 animate-ping' : 'bg-emerald-400'}`}></span>
               PRIORITY 1 DISPATCHES
             </span>
-            <span className="font-mono text-[8px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold">
-              CRITICAL
+            <span className={`font-mono text-[8px] px-1.5 py-0.5 rounded font-bold ${
+              activeCount > 0 ? "bg-rose-500/20 text-rose-400 border border-rose-500/30" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+            }`}>
+              {activeCount > 0 ? "CRITICAL" : "NOMINAL"}
             </span>
           </div>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-3xl font-black font-mono text-rose-500 tracking-tight">{activeCount}</span>
-            <span className="text-[10px] text-rose-300/70 font-mono">ACTIVE BEACONS</span>
+            <span className={`text-3xl font-black font-mono tracking-tight ${activeCount > 0 ? 'text-rose-500' : 'text-slate-100'}`}>
+              {activeCount}
+            </span>
+            <span className="text-[10px] text-slate-400 font-mono">ACTIVE BEACONS</span>
           </div>
-          <div className="font-mono text-[8px] text-slate-400 mt-1 flex items-center justify-between border-t border-rose-900/30 pt-1">
-            <span>IMMEDIATE EXTRACTION</span>
-            <span className="text-rose-400 font-semibold">{activeCount > 0 ? "TRIAGE REQ" : "ALL CLEAR"}</span>
+          <div className="font-mono text-[8px] text-slate-500 mt-1 flex items-center justify-between border-t border-slate-800/80 pt-1">
+            <span>FIELD TRIAGE</span>
+            <span className={activeCount > 0 ? "text-rose-400 font-semibold" : "text-emerald-400 font-semibold"}>
+              {activeCount > 0 ? "RESCUE DISPATCH REQ" : "ALL SECTORS SECURE"}
+            </span>
           </div>
         </div>
 
-        {/* Metric 2: Acknowledged / Responding (Amber) */}
-        <div className="bg-gradient-to-br from-amber-950/20 to-slate-950/80 border border-amber-500/30 rounded-xl p-3 flex flex-col justify-between shadow-[0_0_20px_rgba(245,158,11,0.06)] relative overflow-hidden">
+        {/* Metric 2: Acknowledged / Responding */}
+        <div className={`border rounded-xl p-3 flex flex-col justify-between relative overflow-hidden ${
+          ackCount > 0
+            ? "bg-gradient-to-br from-amber-950/20 to-slate-950/80 border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.06)]"
+            : "bg-slate-950/60 border-slate-800/80"
+        }`}>
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[9px] text-amber-300 tracking-wider font-bold uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span className="font-mono text-[9px] text-slate-300 tracking-wider font-bold uppercase flex items-center gap-1.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${ackCount > 0 ? 'bg-amber-500' : 'bg-slate-600'}`}></span>
               IN-ROUTE TEAMS
             </span>
-            <span className="font-mono text-[8px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
-              EN ROUTE
+            <span className={`font-mono text-[8px] px-1.5 py-0.5 rounded font-bold ${
+              ackCount > 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-slate-800 text-slate-500"
+            }`}>
+              {ackCount > 0 ? "EN ROUTE" : "STANDBY"}
             </span>
           </div>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-3xl font-black font-mono text-amber-400 tracking-tight">{ackCount}</span>
-            <span className="text-[10px] text-amber-300/70 font-mono">RESPONDING</span>
+            <span className={`text-3xl font-black font-mono tracking-tight ${ackCount > 0 ? 'text-amber-400' : 'text-slate-100'}`}>
+              {ackCount}
+            </span>
+            <span className="text-[10px] text-slate-400 font-mono">RESPONDING</span>
           </div>
-          <div className="font-mono text-[8px] text-slate-400 mt-1 flex items-center justify-between border-t border-amber-900/30 pt-1">
-            <span>AVG RESPONSE TIME</span>
-            <span className="text-amber-400 font-semibold">3.4 MIN</span>
+          <div className="font-mono text-[8px] text-slate-500 mt-1 flex items-center justify-between border-t border-slate-800/80 pt-1">
+            <span>DISPATCH STATUS</span>
+            <span className={ackCount > 0 ? "text-amber-400 font-semibold" : "text-slate-400"}>
+              {ackCount > 0 ? "EXTRACTION IN PROGRESS" : "READY AT BASE POST"}
+            </span>
           </div>
         </div>
 
-        {/* Metric 3: Resolved & Secured (Cyber Emerald) */}
-        <div className="bg-gradient-to-br from-emerald-950/20 to-slate-950/80 border border-emerald-500/30 rounded-xl p-3 flex flex-col justify-between shadow-[0_0_20px_rgba(16,185,129,0.06)] relative overflow-hidden">
+        {/* Metric 3: Resolved & Secured */}
+        <div className={`border rounded-xl p-3 flex flex-col justify-between relative overflow-hidden ${
+          resolvedCount > 0
+            ? "bg-gradient-to-br from-emerald-950/20 to-slate-950/80 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.06)]"
+            : "bg-slate-950/60 border-slate-800/80"
+        }`}>
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[9px] text-emerald-300 tracking-wider font-bold uppercase flex items-center gap-1.5">
-              <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+            <span className="font-mono text-[9px] text-slate-300 tracking-wider font-bold uppercase flex items-center gap-1.5">
+              <CheckCircle2 className={`w-2.5 h-2.5 ${resolvedCount > 0 ? 'text-emerald-400' : 'text-slate-500'}`} />
               SECURED / EXTRACTED
             </span>
-            <span className="font-mono text-[8px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
-              SAFE
+            <span className={`font-mono text-[8px] px-1.5 py-0.5 rounded font-bold ${
+              resolvedCount > 0 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-800 text-slate-500"
+            }`}>
+              {resolvedCount > 0 ? "ARCHIVED" : "CLEARED"}
             </span>
           </div>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-3xl font-black font-mono text-emerald-400 tracking-tight">{resolvedCount}</span>
-            <span className="text-[10px] text-emerald-300/70 font-mono">RESOLVED</span>
+            <span className={`text-3xl font-black font-mono tracking-tight ${resolvedCount > 0 ? 'text-emerald-400' : 'text-slate-100'}`}>
+              {resolvedCount}
+            </span>
+            <span className="text-[10px] text-slate-400 font-mono">RESOLVED</span>
           </div>
-          <div className="font-mono text-[8px] text-slate-400 mt-1 flex items-center justify-between border-t border-emerald-900/30 pt-1">
-            <span>EXTRACTION RATE</span>
-            <span className="text-emerald-400 font-semibold">100.0%</span>
+          <div className="font-mono text-[8px] text-slate-500 mt-1 flex items-center justify-between border-t border-slate-800/80 pt-1">
+            <span>RESOLVED TOTAL</span>
+            <span className="text-slate-300 font-semibold">
+              {resolvedCount > 0 ? `${resolvedCount} MISSION(S) SECURED` : "NO CLOSED INCIDENTS"}
+            </span>
           </div>
         </div>
 
-        {/* Metric 4: Mesh Topology & Hops (Electric Cyan) */}
-        <div className="bg-gradient-to-br from-cyan-950/20 to-slate-950/80 border border-cyan-500/30 rounded-xl p-3 flex flex-col justify-between shadow-[0_0_20px_rgba(6,182,212,0.06)] relative overflow-hidden">
+        {/* Metric 4: Mesh Topology & Hops */}
+        <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[9px] text-cyan-300 tracking-wider font-bold uppercase flex items-center gap-1.5">
               <Wifi className="w-2.5 h-2.5 text-cyan-400" />
@@ -426,9 +509,9 @@ export default function SosControlRoom() {
             <span className="text-3xl font-black font-mono text-cyan-300 tracking-tight">{maxHops}</span>
             <span className="text-[10px] text-cyan-300/70 font-mono">MAX RELAY HOPS</span>
           </div>
-          <div className="font-mono text-[8px] text-slate-400 mt-1 flex items-center justify-between border-t border-cyan-900/30 pt-1">
-            <span>PACKET LOSS RATE</span>
-            <span className="text-cyan-400 font-semibold">0.0% (STORE & FWD)</span>
+          <div className="font-mono text-[8px] text-slate-500 mt-1 flex items-center justify-between border-t border-slate-800/80 pt-1">
+            <span>INGESTION PROTOCOL</span>
+            <span className="text-cyan-400 font-semibold">STORE-AND-FORWARD</span>
           </div>
         </div>
       </section>
@@ -437,7 +520,9 @@ export default function SosControlRoom() {
       {loading ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-3">
           <Loader2 className="w-9 h-9 text-sky-400 animate-spin" />
-          <span className="font-mono text-xs text-slate-400 tracking-widest uppercase">INITIALIZING TACTICAL C2 INTERFACES...</span>
+          <span className="font-mono text-xs text-slate-400 tracking-widest uppercase">
+            CONNECTING TO MONGODB ATLAS CLUSTER...
+          </span>
         </div>
       ) : (
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative z-10">
@@ -457,7 +542,7 @@ export default function SosControlRoom() {
                 />
               </div>
 
-              {/* Status Tabs */}
+              {/* Status Tabs with Dynamic Real Counts */}
               <div className="flex gap-1.5">
                 {[
                   { id: "ALL", label: `ALL (${alerts.length})` },
@@ -504,21 +589,73 @@ export default function SosControlRoom() {
               </div>
             </div>
 
-            {/* Incidents Scrollable List */}
+            {/* Database Connection Error Banner (If MongoDB fails) */}
+            {errorMsg && (
+              <div className="mx-3 mt-3 p-3 rounded-lg bg-rose-950/20 border border-rose-500/40 text-rose-300 font-mono text-[9px] flex flex-col gap-1.5 shrink-0">
+                <div className="flex items-center gap-1.5 font-bold uppercase text-[10px]">
+                  <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
+                  MongoDB Connection Error
+                </div>
+                <div className="text-slate-300">{errorMsg}</div>
+                <button
+                  onClick={() => fetchAlerts(true)}
+                  className="mt-1 w-fit font-mono text-[8px] px-2.5 py-1 rounded bg-rose-900/40 border border-rose-500/40 text-rose-200 hover:bg-rose-800/40 cursor-pointer"
+                >
+                  Retry Database Connection
+                </button>
+              </div>
+            )}
+
+            {/* Incidents Scrollable List (Dynamic or Authentic 0-Alerts State) */}
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 min-h-0">
-              {filteredAlerts.length === 0 ? (
+              {alerts.length === 0 ? (
+                /* Authentic 0-Alerts Empty State */
+                <div className="flex-1 flex flex-col items-center justify-center p-6 text-center border border-dashed border-slate-800/80 rounded-xl bg-slate-950/40 my-6">
+                  <div className="relative mb-3 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                      <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div className="absolute inset-0 rounded-full border border-emerald-400/20 animate-ping" />
+                  </div>
+                  <span className="font-mono text-xs text-emerald-400 font-black tracking-wider">
+                    NO ACTIVE SOS INCIDENTS
+                  </span>
+                  <span className="font-mono text-[9px] text-slate-400 mt-1 uppercase font-semibold">
+                    ALL WILDERNESS SECTORS REPORT NOMINAL
+                  </span>
+                  <p className="font-mono text-[8px] text-slate-500 mt-2 max-w-[280px] leading-relaxed">
+                    0 emergency packets stored in MongoDB Atlas. Delay-Tolerant BLE mesh gateways are listening on 2.4 GHz for distress beacons.
+                  </p>
+                  
+                  <div className="mt-4 pt-4 border-t border-slate-800/80 w-full flex flex-col items-center gap-2">
+                    <button
+                      onClick={transmitTestSosToDatabase}
+                      disabled={actionLoading}
+                      className="font-mono text-[9px] px-3.5 py-2 rounded-lg bg-rose-600/20 border border-rose-500/40 text-rose-300 hover:bg-rose-600/30 cursor-pointer transition-all flex items-center gap-1.5 font-bold shadow-md hover:border-rose-400 active:scale-95 disabled:opacity-50"
+                    >
+                      <Zap className="w-3.5 h-3.5 text-amber-300" />
+                      {actionLoading ? "WRITING TO MONGO ATLAS..." : "TRANSMIT TEST SOS TO DATABASE"}
+                    </button>
+                    <span className="font-mono text-[8px] text-slate-600">
+                      Writes a real emergency alert document into MongoDB Atlas
+                    </span>
+                  </div>
+                </div>
+              ) : filteredAlerts.length === 0 ? (
+                /* Filter Match Empty State */
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center border border-dashed border-slate-800/80 rounded-xl bg-slate-950/40 my-6">
-                  <Activity className="w-8 h-8 text-slate-700 mb-3 animate-pulse" />
-                  <span className="font-mono text-xs text-slate-400 font-bold tracking-wider">NO INCIDENTS IN QUEUE</span>
-                  <p className="font-mono text-[9px] text-slate-500 mt-1 max-w-[240px]">
-                    All wilderness sectors report nominal conditions. Click below to simulate an ad-hoc distress signal.
+                  <Search className="w-8 h-8 text-slate-600 mb-2" />
+                  <span className="font-mono text-xs text-slate-400 font-bold tracking-wider">
+                    NO INCIDENTS MATCHING FILTER
+                  </span>
+                  <p className="font-mono text-[9px] text-slate-500 mt-1">
+                    No alerts in MongoDB match your active filter criteria.
                   </p>
                   <button
-                    onClick={simulateNewDistressBeacon}
-                    className="mt-4 font-mono text-[9px] px-3 py-1.5 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-300 hover:bg-rose-900/60 cursor-pointer transition-all flex items-center gap-1.5 font-bold"
+                    onClick={() => { setFilterStatus("ALL"); setFilterSector("ALL"); setSearchQuery(""); }}
+                    className="mt-3 font-mono text-[9px] px-3 py-1 rounded-md bg-slate-800 text-sky-400 hover:bg-slate-700 cursor-pointer"
                   >
-                    <PlusCircle className="w-3.5 h-3.5" />
-                    SEED TEST BEACON
+                    Reset Filter
                   </button>
                 </div>
               ) : (
@@ -641,7 +778,7 @@ export default function SosControlRoom() {
                         <span className="text-slate-600">ID: {alert.sosId.replace("SOS-", "")}</span>
                       </div>
 
-                      {/* Tactical Action Buttons (Always accessible when selected or expanded) */}
+                      {/* Tactical Action Buttons (Dynamic MongoDB Updates) */}
                       {isSelected && (
                         <div className="flex gap-2 pt-2 border-t border-slate-800/80 pl-1.5">
                           {isActive && (
@@ -770,7 +907,7 @@ export default function SosControlRoom() {
                 <span>•</span>
                 <span>ENC: AES-128 GCM</span>
                 <span>•</span>
-                <span className="text-emerald-400 font-bold">SYSTEM READY</span>
+                <span className="text-emerald-400 font-bold">MONGODB SYNC READY</span>
               </div>
             </footer>
           </main>

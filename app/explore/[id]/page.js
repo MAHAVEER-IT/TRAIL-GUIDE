@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Compass, Network, Eye, Smartphone } from "lucide-react";
+import { ArrowLeft, Compass, Network, Eye, Smartphone, Video } from "lucide-react";
 import InteractiveMap from "../../components/InteractiveMap";
+import DemoVideoPlayer from "../../components/DemoVideoPlayer";
 import HeroHeader from "../../components/HeroHeader";
 import QRCode from "react-qr-code";
 
@@ -175,6 +176,24 @@ export default async function DestinationDetail({ params }) {
             <div className="w-full aspect-video rounded-xl border border-zinc-800/80 bg-[#080808] relative overflow-hidden">
               <InteractiveMap lat={dest.lat} lng={dest.lng} name={dest.name} sectorId={dest.id} />
             </div>
+          </div>
+
+          {/* Live Mobile Field Trial Demonstration Video */}
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <h3 className="font-mono text-xs tracking-[0.2em] text-zinc-500 uppercase flex items-center gap-2">
+                <Video className="w-3.5 h-3.5 text-emerald-400" />
+                MOBILE FIELD DEMONSTRATION &amp; PDR HUD
+              </h3>
+              <span className="font-mono text-[9px] text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/20 border border-emerald-500/20 uppercase font-semibold">
+                OFFLINE GROUND PROOF
+              </span>
+            </div>
+
+            <DemoVideoPlayer 
+              src="/videos/offline_tracking_demo.mp4" 
+              sectorName={dest.name} 
+            />
           </div>
 
         </section>
